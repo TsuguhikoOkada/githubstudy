@@ -1,13 +1,33 @@
 name: learn-github-actions
-run-name: ${{ github.actor }} is learning GitHub Actions
-on: [push]
+on: 
+  push:
+    branches:
+      -develop # or the name of your default branch
+
 jobs:
-  check-bats-version:
+  update-history:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
         with:
-          node-version: '14'
-      - run: npm install -g bats
-      - run: bats -v
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get latest commit message
+        id: commit
+        run: |
+          echo "MESSAGE=$(git log -1 --pretty=%B)" >> $GITHUB_ENV
+
+      - name: Save commit message to file
+        run: |
+          filename=$(date +"%Y%m%d_%H%M%S.md")
+          echo "${{ env.MESSAGE }}" > $filename
+
+      - name: Commit and push
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add .
+          git commit -m "Added latest commit message"
+          git push
