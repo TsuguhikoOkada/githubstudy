@@ -19,12 +19,12 @@ jobs:
       - name: Get latest commit message
         id: commit
         run: |
-          echo "::set-output name=message::$(git log -1 --pretty=%B)"
+          echo "MESSAGE=$(git log -1 --pretty=%B)" >> $GITHUB_ENV
 
       - name: Save commit message to file
         run: |
           filename=$(date +"%Y%m%d_%H%M%S.md")
-          echo "${{ steps.commit.outputs.message }}" > $filename
+          echo "${{ env.MESSAGE }}" > $filename
 
       - name: Commit and push
         run: |
