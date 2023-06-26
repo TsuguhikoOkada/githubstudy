@@ -1,3 +1,3 @@
 # this is readme.md
 
-My name is Tsuguhiko Okada
+My name is Tsuguhiko Okada.
