@@ -1,8 +1,9 @@
+# GitHub Actions workflow
 name: learn-github-actions
 on: 
   push:
     branches:
-      -develop # or the name of your default branch
+      - main # or the name of your default branch
 
 jobs:
   update-history:
@@ -14,15 +15,22 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Get latest commit message
-        id: commit
-        run: |
-          echo "MESSAGE=$(git log -1 --pretty=%B)" >> $GITHUB_ENV
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
 
-      - name: Save commit message to file
+      - name: Install dependencies
         run: |
-          filename=$(date +"%Y%m%d_%H%M%S.md")
-          echo "${{ env.MESSAGE }}" > $filename
+          python -m pip install --upgrade pip
+          pip install PyGithub
+
+      - name: Run Python script
+        run: python save_message.py
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_SHA: ${{ github.sha }}
 
       - name: Commit and push
         run: |
