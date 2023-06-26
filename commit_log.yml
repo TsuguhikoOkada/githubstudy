@@ -1,0 +1,28 @@
+name: Record Commit Message
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 2  # fetch HEAD and one commit prior
+
+    - name: Extract Commit Message
+      run: |
+        git log --format=%B -n 1 ${{ github.event.before }} > message.txt
+        echo COMMIT_MESSAGE=$(cat message.txt) >> $GITHUB_ENV
+        echo COMMIT_TIME=$(date +%Y%m%d_%H%M%S) >> $GITHUB_ENV
+
+    - name: Create and Commit Markdown File
+      run: |
+        echo $COMMIT_MESSAGE > $COMMIT_TIME.md
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add -A
+        git commit -m "Add commit log file" -a || exit 0
+        git push
