@@ -1,8 +1,8 @@
 name: Update Commit History
-on: 
+on:
   push:
     branches:
-      - develop # or the name of your default branch
+      - main # or the name of your default branch
 
 jobs:
   update-history:
@@ -10,36 +10,26 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
           python-version: '3.x'
-          
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install PyGithub
 
-      - name: Get and save the latest commit message to Markdown
-        run: python add_commit_to_md.py
-
-      - name: Setup SSH for git
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan github.com >> ~/.ssh/known_hosts
+      - name: Get and save the latest commit message to markdown
         env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-      
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python add_commit_to_markdown.py
+
       - name: Commit and push
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
           git add .
           git commit -m "Added latest commit message to markdown"
-          git push git@github.com:USERNAME/REPOSITORY.git HEAD:develop
+          git push
