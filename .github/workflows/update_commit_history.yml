@@ -1,4 +1,5 @@
-name: learn-github-actions
+# .github/workflows/update_commit_history.yml
+name: Update Commit History
 on: 
   push:
     branches:
@@ -24,13 +25,13 @@ jobs:
           python -m pip install --upgrade pip
           pip install PyGithub
 
-      - name: Get and save the latest commit message to HTML
-        run: python add_commit_to_html.py
+      - name: Get and save the latest commit message to markdown
+        run: python add_commit_to_md.py
 
       - name: Commit and push
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
           git add .
-          git commit -m "Added latest commit message to HTML"
+          git commit -m "Added latest commit message to markdown"
           git push
