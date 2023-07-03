@@ -2,7 +2,7 @@ from github import Github
 import os
 import datetime
 
-# Using an access token
+
 g = Github(os.environ['GITHUB_TOKEN'])
 
 # Get repo by name
